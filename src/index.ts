@@ -44,6 +44,7 @@ export default ({ canvas, workerUrl, name }: ProxyData, data: unknown[]) => {
                         ...data,
                     }),
                 );
+                (window as any)[name] = null;
             };
 
             script.onerror = err => reject(err);
