@@ -1,5 +1,5 @@
 {
-    "name": "[PROJECT_NAME_HERE]",
+    "name": "offscreen-canvas-proxy",
     "version": "0.0.1",
     "description": "[PROJECT_DESCRIPTION_HERE]",
     "main": "dist/index.js",
@@ -11,15 +11,16 @@
     "author": "Pavel Mazhuga",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/pavel-mazhuga/[PROJECT_NAME_HERE]/issues"
+        "url": "https://github.com/pavel-mazhuga/offscreen-canvas-proxy/issues"
     },
-    "homepage": "https://github.com/pavel-mazhuga/[PROJECT_NAME_HERE]#readme",
+    "homepage": "https://github.com/pavel-mazhuga/offscreen-canvas-proxy#readme",
     "scripts": {
         "prepare": "rimraf ./dist && rollup --config",
         "test": "jest"
     },
     "devDependencies": {
         "@types/jest": "latest",
+        "@types/offscreencanvas": "^2019.6.1",
         "@typescript-eslint/eslint-plugin": "latest",
         "@typescript-eslint/parser": "latest",
         "eslint": "latest",
@@ -37,6 +38,10 @@
         "typescript": "latest"
     },
     "dependencies": {
+        "comlink": "^4.2.0",
         "eslint-plugin-jest": "latest"
+    },
+    "peerDependencies": {
+        "comlink": "^4.2.0"
     }
 }
