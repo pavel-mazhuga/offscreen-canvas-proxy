@@ -1,11 +1,11 @@
 {
     "name": "offscreen-canvas-proxy",
     "version": "0.0.1",
-    "description": "[PROJECT_DESCRIPTION_HERE]",
+    "description": "Offscreen Canvas proxy",
     "main": "dist/index.js",
     "repository": {
         "type": "git",
-        "url": "[GIT_REPO_HERE]"
+        "url": "git@github.com:pavel-mazhuga/offscreen-canvas-proxy.git"
     },
     "keywords": [],
     "author": "Pavel Mazhuga",
