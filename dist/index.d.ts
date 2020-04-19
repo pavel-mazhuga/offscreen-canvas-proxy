@@ -1,13 +1,23 @@
-interface ProxyData {
+import { Remote } from 'comlink';
+declare type ProxyData = {
     canvas: HTMLCanvasElement;
     workerUrl: string;
-    name: string;
+};
+export declare type OffscreenBaseData = {
+    canvas: HTMLCanvasElement;
+    isWorker: boolean;
+};
+export interface BaseEntity {
+    rAF: number;
+    state: Record<string, any>;
+    canvas: HTMLCanvasElement;
+    isWorker: boolean;
 }
-declare const _default: ({ canvas, workerUrl, name }: ProxyData, data: unknown[]) => Promise<unknown>;
-/**
- * @param  {} canvas - HTMLCanvasElement
- * @param  {} workerUrl - path to the worker file
- * @param  {} name - unique name for accessing module from 'window' object
- * (if 'transferControlToOffscreen' is not supported)
- */
-export default _default;
+export declare class BaseEntity {
+    constructor(options: OffscreenBaseData);
+    getState(): Record<string, any>;
+    setState(newState?: {}): void;
+}
+export declare function createOffscreenCanvas<T = any>({ canvas, workerUrl }: ProxyData, data: Record<string, any>): Promise<Remote<T>>;
+export declare function initializeWorker(factory: Function): void;
+export {};
