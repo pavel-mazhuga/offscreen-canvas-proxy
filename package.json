@@ -1,6 +1,6 @@
 {
     "name": "offscreen-canvas-proxy",
-    "version": "0.0.3",
+    "version": "0.1.0",
     "description": "Offscreen Canvas proxy",
     "main": "dist/index.js",
     "repository": {
