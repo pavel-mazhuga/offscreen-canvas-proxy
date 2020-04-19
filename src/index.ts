@@ -1,30 +1,55 @@
-import { wrap } from 'comlink';
+/* eslint-disable no-restricted-globals */
+import { wrap, expose, Remote } from 'comlink';
 
-interface ProxyData {
+type ProxyData = {
     canvas: HTMLCanvasElement;
     workerUrl: string;
-    id: string;
-}
+};
 
-export interface OffscreenBaseData {
+export type OffscreenBaseData = {
+    canvas: HTMLCanvasElement;
+    isWorker: boolean;
+};
+
+export interface BaseEntity {
+    rAF: number;
+    state: Record<string, any>;
     canvas: HTMLCanvasElement;
     isWorker: boolean;
 }
 
+export class BaseEntity {
+    constructor(options: OffscreenBaseData) {
+        this.rAF = 0;
+        this.state = {};
+        this.canvas = options.canvas;
+        this.isWorker = options.isWorker;
+    }
+
+    getState() {
+        return this.state;
+    }
+
+    setState(newState = {}) {
+        this.state = { ...this.state, ...newState };
+    }
+}
+
 /**
  * @param  {} canvas - HTMLCanvasElement
- * @param  {} workerUrl - path to the worker file
- * @param  {} id - unique id for accessing module from 'window' object
- * (if 'transferControlToOffscreen' is not supported)
+ * @param  {} workerUrl - path to a worker file
  */
-export function createOffscreenCanvas<T>({ canvas, workerUrl, id }: ProxyData, data: Record<string, any>): Promise<T> {
+export function createOffscreenCanvas<T = any>(
+    { canvas, workerUrl }: ProxyData,
+    data: Record<string, any>,
+): Promise<Remote<T>> {
     return new Promise((resolve, reject) => {
         if (canvas.transferControlToOffscreen) {
             try {
                 const worker = new Worker(workerUrl);
                 const offscreen = canvas.transferControlToOffscreen();
 
-                worker.addEventListener('message', event => {
+                worker.addEventListener('message', (event) => {
                     if (event.data === 'ready') {
                         const proxy = wrap<T>(worker);
                         resolve(proxy);
@@ -34,11 +59,7 @@ export function createOffscreenCanvas<T>({ canvas, workerUrl, id }: ProxyData, d
                 worker.postMessage(
                     {
                         message: 'init',
-                        options: {
-                            canvas: offscreen,
-                            isWorker: true,
-                            ...data,
-                        },
+                        options: { canvas: offscreen, isWorker: true, ...data },
                     },
                     [offscreen],
                 );
@@ -50,40 +71,20 @@ export function createOffscreenCanvas<T>({ canvas, workerUrl, id }: ProxyData, d
             script.src = workerUrl;
             script.async = true;
             script.onload = () => {
-                resolve(
-                    new (window as any)[id]({
-                        canvas,
-                        isWorker: false,
-                        ...data,
-                    }),
-                );
-                (window as any)[id] = null;
+                resolve((window as any)[workerUrl]({ canvas, isWorker: false, ...data }));
+                (window as any)[workerUrl] = null;
             };
-            script.onerror = err => reject(err);
+            script.onerror = (err) => reject(err);
             document.head.appendChild(script);
         }
     });
 }
 
-export class BaseEntity {
-    private rAF: number;
-
-    canvas: HTMLCanvasElement;
-
-    isWorker: boolean;
-
-    constructor(options: OffscreenBaseData) {
-        this.rAF = 0;
-        this.state = {};
-        this.canvas = options.canvas;
-        this.isWorker = options.isWorker;
-    }
-
-    async getState() {
-        return this.state;
-    }
-
-    async setState(newState = {}) {
-        this.state = { ...this.state, ...newState };
-    }
+export function initializeWorker(factory: Function) {
+    self.addEventListener('message', ({ data: { message, options } }) => {
+        if (message === 'init') {
+            expose(factory(options));
+            (self as any).postMessage('ready');
+        }
+    });
 }
