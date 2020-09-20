@@ -18,6 +18,6 @@ export declare class BaseEntity {
     getState(): Record<string, any>;
     setState(newState?: {}): void;
 }
-export declare function createOffscreenCanvas<T = any>({ canvas, workerUrl }: ProxyData, data: Record<string, any>): Promise<Remote<T>>;
-export declare function initializeWorker(factory: Function): void;
+export declare function createOffscreenCanvas<T = any>({ canvas, workerUrl }: ProxyData, data: Record<string, any>, forceMainThread?: boolean): Promise<Remote<T>>;
+export declare function initializeWorker(factory: (_options: any) => any): void;
 export {};
