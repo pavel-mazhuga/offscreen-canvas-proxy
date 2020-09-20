@@ -42,9 +42,10 @@ export class BaseEntity {
 export function createOffscreenCanvas<T = any>(
     { canvas, workerUrl }: ProxyData,
     data: Record<string, any>,
+    forceMainThread = false,
 ): Promise<Remote<T>> {
     return new Promise((resolve, reject) => {
-        if (canvas.transferControlToOffscreen) {
+        if (canvas.transferControlToOffscreen && !forceMainThread) {
             try {
                 const worker = new Worker(workerUrl);
                 const offscreen = canvas.transferControlToOffscreen();
@@ -80,7 +81,7 @@ export function createOffscreenCanvas<T = any>(
     });
 }
 
-export function initializeWorker(factory: Function) {
+export function initializeWorker(factory: (_options: any) => any) {
     self.addEventListener('message', ({ data: { message, options } }) => {
         if (message === 'init') {
             expose(factory(options));
