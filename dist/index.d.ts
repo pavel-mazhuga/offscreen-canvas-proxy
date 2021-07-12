@@ -1,7 +1,7 @@
 import { Remote } from 'comlink';
 declare type ProxyData = {
     canvas: HTMLCanvasElement;
-    workerUrl: string;
+    workerUrl: string | URL;
 };
 export declare type OffscreenBaseData = {
     canvas: HTMLCanvasElement;

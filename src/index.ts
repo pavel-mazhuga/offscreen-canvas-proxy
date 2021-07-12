@@ -3,7 +3,7 @@ import { wrap, expose, Remote } from 'comlink';
 
 type ProxyData = {
     canvas: HTMLCanvasElement;
-    workerUrl: string;
+    workerUrl: string | URL;
 };
 
 export type OffscreenBaseData = {
@@ -69,11 +69,12 @@ export function createOffscreenCanvas<T = any>(
             }
         } else {
             const script = document.createElement('script');
-            script.src = workerUrl;
+            const src = workerUrl instanceof URL ? workerUrl.toString() : workerUrl;
+            script.src = src;
             script.async = true;
             script.onload = () => {
-                resolve((window as any)[workerUrl]({ canvas, isWorker: false, ...data }));
-                (window as any)[workerUrl] = null;
+                resolve((window as any)[src]({ canvas, isWorker: false, ...data }));
+                (window as any)[src] = null;
             };
             script.onerror = (err) => reject(err);
             document.head.appendChild(script);
