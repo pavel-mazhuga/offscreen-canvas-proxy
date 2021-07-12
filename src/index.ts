@@ -47,7 +47,7 @@ export function createOffscreenCanvas<T = any>(
     return new Promise((resolve, reject) => {
         if (canvas.transferControlToOffscreen && !forceMainThread) {
             try {
-                const worker = new Worker(workerUrl);
+                const worker = new Worker(workerUrl, { type: 'module' });
                 const offscreen = canvas.transferControlToOffscreen();
 
                 worker.addEventListener('message', (event) => {
