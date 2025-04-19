@@ -3,6 +3,7 @@ import { wrap, expose, Remote } from 'comlink';
 
 type ProxyData = {
     canvas: HTMLCanvasElement;
+    worker?: Worker;
     WorkerConstructor?: new () => Worker;
     workerUrl: string | URL;
 };
@@ -42,14 +43,16 @@ export class BaseEntity {
  * @param  {} workerUrl - path to a worker file
  */
 export function createOffscreenCanvas<T = any>(
-    { canvas, WorkerConstructor, workerUrl }: ProxyData,
+    { canvas, worker: workerInstance, WorkerConstructor, workerUrl }: ProxyData,
     data: Record<string, any>,
     forceMainThread = false,
 ): Promise<Remote<T>> {
     return new Promise((resolve, reject) => {
         if (canvas.transferControlToOffscreen && !forceMainThread) {
             try {
-                const worker = WorkerConstructor ? new WorkerConstructor() : new Worker(workerUrl, { type: 'module' });
+                const worker =
+                    workerInstance ||
+                    (WorkerConstructor ? new WorkerConstructor() : new Worker(workerUrl, { type: 'module' }));
                 const offscreen = canvas.transferControlToOffscreen();
 
                 worker.addEventListener('message', (event) => {
